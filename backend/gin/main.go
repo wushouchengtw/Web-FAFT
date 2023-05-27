@@ -71,16 +71,14 @@ func main() {
 
 	// Create if necessary
 	createTables := func() {
-		if err := d.CreateTableStainless(DB); err != nil {
-			log.Fatal("Failed to create stainless table")
+		t := d.TableJson{
+			JsonFile: "dbConfig_table.json",
 		}
-		// Create localTest
-		if err := d.CreateTableLocalTestTable(DB); err != nil {
-			log.Fatal("Failed to create localTest table")
-		}
-		// Create Test Owner
-		if err := d.CreateTableCaseTable(DB); err != nil {
-			log.Fatal("Failed to create case table")
+		mapping := t.GenerateTableMap()
+		for tableName, sqlString := range mapping {
+			if err := d.CreateTable(DB, string(tableName), sqlString); err != nil {
+				log.Fatal("Failed to create tables: ", err)
+			}
 		}
 	}
 	createTables()
