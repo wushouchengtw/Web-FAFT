@@ -1,0 +1,104 @@
+[
+    {
+        "tablename": "Stainless_Result",
+        "sql": [
+            {
+                "key":"id",
+                "type":"int AUTO_INCREMENT PRIMARY KEY"
+            },
+            {
+                "key":"time",
+                "type":"TIMESTAMP"
+            },{
+                "key":"duration",
+                "type":"varchar(10)"
+            },{
+                "key":"suite",
+                "type":"varchar(40)"
+            },{
+                "key":"board",
+                "type":"varchar(20)"
+            },{
+                "key":"model",
+                "type":"varchar(20)"
+            },{
+                "key":"buildVersion",
+                "type":"varchar(20)"
+            },{
+                "key":"host",
+                "type":"varchar(60)"
+            },{
+                "key":"testName",
+                "type":"varchar(80)"
+            },{
+                "key":"status",
+                "type":"varchar(10)"
+            },{
+                "key":"reason",
+                "type":"blob"
+            },{
+                "key":"firmwareROVersion",
+                "type":"varchar(50)"
+            },{
+                "key":"firmwareRWVersion",
+                "type":"varchar(50)"
+            }
+        ]
+    },{
+        "tablename": "Result",
+        "sql": [
+            {
+                "key":"id",
+                "type":"int AUTO_INCREMENT PRIMARY KEY"
+            },
+            {
+                "key":"Time",
+                "type":"datetime"
+            },{
+                "key":"tester",
+                "type":"varchar(15)"
+            },{
+                "key":"name",
+                "type":"varchar(30)"
+            },{
+                "key":"board",
+                "type":"varchar(20)"
+            },{
+                "key":"model",
+                "type":"varchar(20)"
+            },{
+                "key":"version",
+                "type":"varchar(20)"
+            },{
+                "key":"logPath",
+                "type":"varchar(40)"
+            },{
+                "key":"result",
+                "type":"varchar(5)"
+            },{
+                "key":"reason",
+                "type":"text"
+            }
+        ]
+    },{
+        "tablename": "CaseTable",
+        "sql": [
+            {
+                "key":"id",
+                "type":"int AUTO_INCREMENT PRIMARY KEY"
+            },
+            {
+                "key":"CaseName",
+                "type":"varchar(255)"
+            },{
+                "key":"Owner",
+                "type":"varchar(30)"
+            },{
+                "key":"Ticket",
+                "type":"varchar(20)"
+            }
+        ]
+    }
+    ]
+
+	
