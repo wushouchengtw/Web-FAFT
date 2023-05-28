@@ -210,52 +210,26 @@ func runGoToSaveStainlessData(fileName string, db *sql.DB) error {
 
 	rows := readCSV(fileName)
 	d.Log("Start to check collums in csv")
-	if len(rows[0]) != 12 {
-		log.Panicf(fmt.Sprintf("The numbers of collumns should be 12, but it has %d", len(rows)))
+	if len(rows) == 0 {
+		log.Panic("No content in csv files")
 	}
-	for attributeString, _ := range dALocation {
-		for i := 0; i < 12; i++ {
-			if strings.Contains(rows[0][i], attributeString) {
-				dALocation[attributeString] = i
-				break
-			}
-			if i == 11 {
-				log.Panicf(fmt.Sprintf("Attribute [%v] wasn't found on csv files", attributeString))
-			}
-		}
-	}
-	rows = rows[1:]
+	rowData, keys := d.ReturnCSVDataLocation(len(rows[0]), rows)
 
 	batchCount := 0
 	dataInsert := ""
 	batchData := []string{}
-	for i, data := range rows {
-		rowData := d.StainlessResult{
-			Time:              data[dALocation["Started Time"]],
-			Duration:          data[dALocation["Duration"]],
-			Suite:             data[dALocation["Suite"]],
-			Board:             data[dALocation["Board"]],
-			Model:             data[dALocation["Model"]],
-			BuildVersion:      data[dALocation["Build Version"]],
-			Host:              data[dALocation["Hostname"]],
-			TestName:          data[dALocation["Test"]][14:],
-			Status:            data[dALocation["Status"]],
-			Reason:            data[dALocation["Failure Reason"]],
-			FirmwareROVersion: data[dALocation["Firmware RO Version"]],
-			FirmwareRWVersion: data[dALocation["Firmware RW Version"]],
-		}
-
-		if batchCount >= batchSize || i == len(rows)-1 {
+	for i, data := range rowData {
+		if batchCount >= batchSize || i == len(rowData)-1 {
 			d.Log("Batch insert")
 			value := strings.Join(batchData, ",")
-			preSQL := "insert into Stainless_Result (time,duration,suite,board,model,buildVersion,host,testName,status,reason,firmwareROVersion,firmwareRWVersion) values " + value + ";"
+			preSQL := fmt.Sprintf("insert into Stainless_Result (%s) values "+value+";", strings.Join(keys, ","))
 			errInsert := d.RunSqlStmt(db, preSQL)
 			if errInsert != nil {
 				log.Panicf(fmt.Sprintf("Failed to insert [ID: %v] %s into DB: %v", i, data, errInsert))
 			}
 			batchData, batchCount = nil, 0
 		} else {
-			dataInsert = fmt.Sprintf("(%q,%q,%q,%q,%q,%q,%q,%q,%q,%q,%q,%q)", rowData.Time, rowData.Duration, rowData.Suite, rowData.Board, rowData.Model, rowData.BuildVersion, rowData.Host, rowData.TestName, rowData.Status, rowData.Reason, rowData.FirmwareROVersion, rowData.FirmwareRWVersion)
+			dataInsert = dataValue(data)
 			batchData = append(batchData, dataInsert)
 		}
 		batchCount++
@@ -325,4 +299,10 @@ func getCsvFiles() ([]byte, error) {
 		}
 	}
 	return bytes, nil
+}
+
+func dataValue(v []string) string {
+	output := "(\""
+	output += strings.Join(v, "\",\"") + "\")"
+	return output
 }

@@ -11,6 +11,27 @@ import (
 	"time"
 )
 
+type KeyLocation struct {
+	Key      string
+	Location int
+}
+
+// stainlessDLocation would be used to record the current CSV file's data attribute location.
+var stainlessDASLocation = map[string]KeyLocation{
+	"Started Time":        {Key: "time", Location: 0},
+	"Duration":            {Key: "duration", Location: 0},
+	"Suite":               {Key: "suite", Location: 0},
+	"Board":               {Key: "board", Location: 0},
+	"Model":               {Key: "model", Location: 0},
+	"Build Version":       {Key: "buildVersion", Location: 0},
+	"Hostname":            {Key: "host", Location: 0},
+	"Test":                {Key: "testName", Location: 0},
+	"Status":              {Key: "status", Location: 0},
+	"Failure Reason":      {Key: "reason", Location: 0},
+	"Firmware RO Version": {Key: "firmwareROVersion", Location: 0},
+	"Firmware RW Version": {Key: "firmwareRWVersion", Location: 0},
+}
+
 func ValidCsv(inputCsv string, bytes []byte) error {
 	csvD1, csvD2, err := checkCsvInputFormat(inputCsv)
 	if err != nil {
@@ -27,10 +48,10 @@ func ValidCsv(inputCsv string, bytes []byte) error {
 
 // checkCsvInputFormat verifies the input file name should be `\d+-\d+.csv`
 // Rules:
-// 		1. 8 digits date [$year$month$day]
-//      2. Year: after 2020
-//      3. Month: [1-12]
-//      4. Day: [1-31]
+//  1. 8 digits date [$year$month$day]
+//  2. Year: after 2020
+//  3. Month: [1-12]
+//  4. Day: [1-31]
 func checkCsvInputFormat(inputCsv string) (int, int, error) {
 	// Confirm the format is correct
 	nameReg, _ := regexp.Compile(`(\d{4})(\d{2})(\d{2})-(\d{4})(\d{2})(\d{2}).csv`)
@@ -122,4 +143,31 @@ func verifyOverlap(bytes []byte, csvD1, csvD2 int) error {
 		}
 	}
 	return nil
+}
+
+func ReturnCSVDataLocation(collumnsLen int, rows [][]string) (data [][]string, insertKeySequence []string) {
+	if len(rows) == 1 {
+		log.Panicf("Only attributes in csv file")
+	}
+	if len(rows[0]) != 12 {
+		log.Panicf(fmt.Sprintf("The numbers of collumn should be 12, but it has %d", len(rows)))
+	}
+	mapCsvKey := map[string]int{}
+	for attribute, keyMap := range stainlessDASLocation {
+		for index, key := range rows[0] {
+			if strings.Contains(key, attribute) {
+				mapCsvKey[keyMap.Key] = index
+				break
+			}
+			if index == len(stainlessDASLocation)-1 {
+				log.Panicf(fmt.Sprintf("Attribute [%v] wasn't found on csv files", attribute))
+			}
+		}
+	}
+
+	keysSortedByCsv := make([]string, len(mapCsvKey))
+	for key, location := range mapCsvKey {
+		keysSortedByCsv[location] = key
+	}
+	return rows[1:], keysSortedByCsv
 }
