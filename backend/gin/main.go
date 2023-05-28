@@ -18,6 +18,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+const batchSize = 12000
+
 // dALocation would be used to record the current CSV file's data attribute location.
 var dALocation = map[string]int{
 	"Started Time":        0,
@@ -36,6 +38,8 @@ var dALocation = map[string]int{
 
 var DB *sql.DB
 var Router *gin.Engine
+var mapToCreateTables map[d.TableName]string
+var mapTableKeys map[d.TableName][]string
 
 const csvFolder = "stainless"
 
@@ -49,6 +53,11 @@ func init() {
 	if err := json.Unmarshal(out, &dbLogin); err != nil {
 		log.Fatalf("Failed to unmarshal: %s", out)
 	}
+
+	t := d.TableJson{
+		JsonFile: "dbConfig_table.json",
+	}
+	mapToCreateTables, mapTableKeys = t.GenerateTableMap()
 
 	sqlDB := d.NewSql(dbLogin)
 	db, err := sqlDB.NewSqlDBConnect()
@@ -71,12 +80,8 @@ func main() {
 
 	// Create if necessary
 	createTables := func() {
-		t := d.TableJson{
-			JsonFile: "dbConfig_table.json",
-		}
-		mapping := t.GenerateTableMap()
-		for tableName, sqlString := range mapping {
-			if err := d.CreateTable(DB, string(tableName), sqlString); err != nil {
+		for _, sqlStmt := range mapToCreateTables {
+			if err := d.CreateTable(DB, sqlStmt); err != nil {
 				log.Fatal("Failed to create tables: ", err)
 			}
 		}
@@ -221,7 +226,6 @@ func runGoToSaveStainlessData(fileName string, db *sql.DB) error {
 	}
 	rows = rows[1:]
 
-	batchSize := 12000
 	batchCount := 0
 	dataInsert := ""
 	batchData := []string{}
