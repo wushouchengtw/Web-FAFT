@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/jinzhu/now v1.1.5
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
