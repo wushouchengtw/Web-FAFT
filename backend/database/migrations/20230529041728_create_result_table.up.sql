@@ -10,4 +10,6 @@ CREATE TABLE IF NOT EXISTS Result (
     result boolean not NULL,
     firmware_RO_Version varchar(50),
     firmware_RW_version varchar(50),
+    FOREIGN KEY (dut_id) REFERENCES DUT(dut_id)
+    FOREIGN KEY (test_id) REFERENCES Test(test_id)
 );
