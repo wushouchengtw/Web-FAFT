@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS Result (
     duration float,
     suite varchar(64),
     dut_id int not NULL,
-    mileStone int,
+    milestone int,
     version varchar(32),
     host varchar(64) NOT NULL,
     test_id int not NULL,

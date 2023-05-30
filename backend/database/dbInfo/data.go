@@ -32,7 +32,7 @@ type StainlessResult struct {
 	Duration          string `json:"duration"`
 	Suite             string `json:"suite"`
 	DutId             int    `json:"dutId"`
-	MileStone         int    `json:mileStone`
+	Milestone         int    `json:milestone`
 	Version           string `json:version`
 	Host              string `json:"host"`
 	TestId            string `json:"testId"`
