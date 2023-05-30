@@ -1,6 +1,6 @@
-CREATE TABLE IF NOT EXISTS Result (
-    result_id int NOT NULL PRIMARY KEY,
-    time TIMESTAMPTZ,
+CREATE TABLE IF NOT EXISTS result (
+    id int NOT NULL PRIMARY KEY,
+    time TIMESTAMP,
     duration float,
     suite varchar(64),
     dut_id int not NULL,
@@ -10,8 +10,6 @@ CREATE TABLE IF NOT EXISTS Result (
     test_id int not NULL,
     status boolean not NULL,
     reason blob,
-    firmware_RO_Version varchar(64),
-    firmware_RW_version varchar(64),
-    FOREIGN KEY (dut_id) REFERENCES DUT(dut_id)
-    FOREIGN KEY (test_id) REFERENCES Test(test_id)
+    firmware_ro_version varchar(64),
+    firmware_rw_version varchar(64)
 );
