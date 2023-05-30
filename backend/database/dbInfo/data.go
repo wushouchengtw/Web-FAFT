@@ -27,15 +27,15 @@ type LocalResult struct {
 }
 
 type StainlessResult struct {
-	Id                int    `json:"id"`
+	ResultId          int    `json:"resultId"`
 	Time              string `json:"time"`
 	Duration          string `json:"duration"`
 	Suite             string `json:"suite"`
-	Board             string `json:"board"`
-	Model             string `json:"model"`
-	BuildVersion      string `json:"buildVersion"`
+	DutId             int    `json:"dutId"`
+	MileStone         int    `json:mileStone`
+	Version           string `json:version`
 	Host              string `json:"host"`
-	TestName          string `json:"testName"`
+	TestId            string `json:"testId"`
 	Status            string `json:"status"`
 	Reason            string `json:"reason"`
 	FirmwareROVersion string `json:"firmwareROVersion"`
