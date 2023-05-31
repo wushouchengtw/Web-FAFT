@@ -9,12 +9,23 @@ import (
 
 type Configuration struct {
 	Application `yaml:"application"`
+	Database    `yaml:"database"`
 }
 
 type Application struct {
 	Host string `yaml:"host"`
 	Port string `yaml:"port"`
 	Mode string `yaml:"mode"`
+}
+
+type Database struct {
+	Port              string `yaml:"port"`
+	Username          string `yaml:"username"`
+	Password          string `yaml:"password"`
+	Scheme            string `yaml:"scheme"`
+	Host              string `yaml:"host"`
+	MaxIdleConnection int    `yaml:"max_idle_connection"`
+	MaxConnection     int    `yaml:"max_connection"`
 }
 
 func GetConfiguration(path string) (*Configuration, error) {

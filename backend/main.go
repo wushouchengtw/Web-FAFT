@@ -2,7 +2,9 @@ package main
 
 import (
 	"backend/lib"
+	"backend/lib/repos"
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net"
@@ -18,15 +20,32 @@ func main() {
 		log.Fatalf("Can't load the config (%v), get an {%v}", lib.ConfigurationPath, err)
 	}
 
-	listener, err := net.Listen("tcp", fmt.Sprintf("%v:%v", config.Host, config.Port))
+	listener, err := net.Listen("tcp", fmt.Sprintf("%v:%v", config.Application.Host, config.Application.Port))
 	if err != nil {
-		log.Fatalf("Can't listen to {%v}:{%v}, got an {%v}", config.Host, config.Port, err)
+		log.Fatalf("Can't listen to {%v}:{%v}, got an {%v}", config.Application.Host, config.Application.Port, err)
 	}
+
+	db, err := lib.Connect(&config.Database)
+	if err != nil {
+		log.Fatalf("Can't connect to database")
+	}
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Println("Can't close database connection")
+		}
+	}(db)
 
 	srv, err := lib.Run(*config, listener)
 	if err != nil {
 		log.Fatalf("Can't run the server, got an {%v}", err)
 	}
+
+	dutRepo := repos.NewDUTRepoInMem()
+	testRepo := repos.NewTestRepoInMem()
+	resultRepo := repos.NewResultRepoInMem()
+
+	lib.SaveStainlessData("data/20230418-20230424.csv", dutRepo, testRepo, resultRepo)
 
 	sig := make(chan os.Signal)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
