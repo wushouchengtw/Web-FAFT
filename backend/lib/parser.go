@@ -51,6 +51,18 @@ func configHeaderIndex(row []string) map[Header]int {
 	return headers
 }
 
+func parseStatus(status string) (bool, error) {
+  switch strings.ToLower(status) {
+    case "pass":
+      return true, nil
+    case "fail":
+      return false, nil
+    default:
+      log.Printf("Can't parse the status, got an {%v}", status)
+      return false, utils.InvalidData
+  }
+}
+
 func saveResult(
 	row []string,
 	headerIdx map[Header]int,
@@ -65,20 +77,14 @@ func saveResult(
 	var err error
 
 	var dutId int
-	dutId, err = dut_repo.GetIdBy(model, board)
-	if err == utils.NotFound {
-		dutId, err = dut_repo.Save(model, board)
-	}
-	if err != nil {
+	dutId, err = dut_repo.SaveIfNotExist(model, board)
+  if err != nil {
 		return err
 	}
 
 	testName := row[headerIdx[Test]]
 	var testId int
-	testId, err = test_repo.GetIdBy(testName)
-	if err == utils.NotFound {
-		testId, err = test_repo.Save(testName)
-	}
+	testId, err = test_repo.SaveIfNotExist(testName)
 	if err != nil {
 		return err
 	}
@@ -88,16 +94,11 @@ func saveResult(
 		return err
 	}
 
-	var status bool
-	switch strings.ToLower(row[headerIdx[Status]]) {
-	case "pass":
-		status = true
-	case "fail":
-		status = false
-	default:
-		log.Printf("status should be `pass` or `fail`, but got an {%v}", status)
-		return utils.InvalidData
+  status, err := parseStatus(row[headerIdx[Status]])
+  if err != nil {
+		return err
 	}
+
 	startTime, err := time.Parse(timeLayout, row[headerIdx[StartedTime]])
 	if err != nil {
 		log.Printf("Can't parse the startTime, got an {%v}", err)
@@ -164,8 +165,6 @@ func SaveStainlessData(
 		}
 
 		saveResult(row, headers, dut_repo, test_repo, result_repo)
-
-		break
 	}
 
 	return nil
