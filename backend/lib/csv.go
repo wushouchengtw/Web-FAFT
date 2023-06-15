@@ -1,4 +1,4 @@
-package handlers
+package lib
 
 import (
 	"errors"
@@ -20,7 +20,7 @@ func ValidCsv(inputCsv string) error {
 
 	csvFiles, err := getCsvFiles()
 	if err != nil {
-		return fmt.Errorf("failed to get all csv files in %q: %v", csvFolder, err)
+		return fmt.Errorf("failed to get all csv files in %q: %v", CsvFolder, err)
 	}
 
 	if overlap := verifyOverlap(csvFiles, inputCsv); overlap {
@@ -57,7 +57,7 @@ func checkCsvInputFormat(inputCsv string) error {
 }
 
 func getCsvFiles() ([]byte, error) {
-	cmdString := fmt.Sprintf("ls %s | grep .csv", csvFolder)
+	cmdString := fmt.Sprintf("ls %s | grep .csv", CsvFolder)
 	cmd := exec.Command("bash", "-c", cmdString)
 
 	stdout, err := cmd.StdoutPipe()

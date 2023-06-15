@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func SaveRemoteDataByCsv(fileName string, dutMem dut.IDUT, testMem test.Itest, resultMem result.IResut) error {
+func SaveRemoteDataByCsv(fileName string, dutRepo dut.IDUT, testRepo test.Itest, resultRepo result.IResut) error {
 	f, err := os.Open(fileName)
 	if err != nil {
 		return fmt.Errorf("failed to open %q: %v", fileName, err)
@@ -47,7 +47,7 @@ func SaveRemoteDataByCsv(fileName string, dutMem dut.IDUT, testMem test.Itest, r
 		if err != nil {
 			return utils.ErrInvalidData
 		}
-		saveResult(row, header, dutMem, testMem, resultMem)
+		saveResult(row, header, dutRepo, testRepo, resultRepo)
 	}
 	return nil
 }
@@ -87,7 +87,7 @@ func GetCsvHeader(firstRow []string) (map[TestHausHeader]int, error) {
 	return header, nil
 }
 
-func saveResult(row []string, header map[TestHausHeader]int, dutMem dut.IDUT, testMem test.Itest, resultMem result.IResut) error {
+func saveResult(row []string, header map[TestHausHeader]int, dutRepo dut.IDUT, testRepo test.Itest, resultRepo result.IResut) error {
 
 	// Parse data
 	var (
@@ -102,17 +102,17 @@ func saveResult(row []string, header map[TestHausHeader]int, dutMem dut.IDUT, te
 		version   string = "unknown"
 		status    bool   = false
 	)
-	dutId, err = dutMem.GetIdBy(board, model)
+	dutId, err = dutRepo.GetIdBy(board, model)
 	if err == utils.ErrNotFound {
-		dutId, err = dutMem.Save(board, model)
+		dutId, err = dutRepo.Save(board, model)
 	}
 	if err != nil {
 		return fmt.Errorf("failed on processing dut info: %v", err)
 	}
 
-	testId, err = testMem.GetIdBy(test)
+	testId, err = testRepo.GetIdBy(test)
 	if err == utils.ErrFileNotExist {
-		testId, err = testMem.Save(test)
+		testId, err = testRepo.Save(test)
 	}
 	if err != nil {
 		return fmt.Errorf("failed on processing test info: %v", err)
@@ -159,7 +159,7 @@ func saveResult(row []string, header map[TestHausHeader]int, dutMem dut.IDUT, te
 		Host:              Hostname,
 	}
 
-	resultMem.Save(record)
+	resultRepo.Save(record)
 
 	return nil
 }

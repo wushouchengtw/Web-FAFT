@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/lib"
 	"log"
 	"net/http"
 
@@ -10,10 +11,10 @@ import (
 func HandleUploadCsv(ctx *gin.Context) {
 	// To-do: change the name
 	file, _ := ctx.FormFile("stainlessData")
-	if err := ValidCsv(file.Filename); err != nil {
+	if err := lib.ValidCsv(file.Filename); err != nil {
 		ctx.String(http.StatusOK, "Error happend: ", err)
 	} else {
-		ctx.SaveUploadedFile(file, csvFolder+file.Filename)
+		ctx.SaveUploadedFile(file, lib.CsvFolder+file.Filename)
 		log.Println("Saving files in server sucessfully. Start inserting data to DB")
 		// To-do: Save data into db
 		// if err := runGoToSaveStainlessData("stainless/"+file.Filename, DB); err != nil {

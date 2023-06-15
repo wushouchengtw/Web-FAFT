@@ -17,21 +17,24 @@ func NewDutMem() IDUT {
 	}
 }
 
-func (d *DutMem) Save(board, model string) (int, error) {
-	d.id += 1
-	d.data[d.id] = &models.DUT{
-		Id:    d.id,
+func (dm *DutMem) Save(board, model string) (int, error) {
+	dm.id += 1
+	dm.data[dm.id] = &models.DUT{
+		Id:    dm.id,
 		Board: board,
 		Model: model,
 	}
-	return d.id, nil
+	return dm.id, nil
 }
 
-func (d *DutMem) GetIdBy(board, name string) (int, error) {
-	for id, dut := range d.data {
-		if dut.Board == board && dut.Model == dut.Model {
+func (dm *DutMem) GetIdBy(board, model string) (int, error) {
+	for id, dut := range dm.data {
+		if dut.Board == board && dut.Model == model {
 			return id, nil
 		}
 	}
 	return -1, utils.ErrNotFound
+}
+
+func (dm *DutMem) GetDUTCache() {
 }
