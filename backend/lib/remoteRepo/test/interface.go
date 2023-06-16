@@ -1,11 +1,11 @@
 package test
 
 type Itest interface {
-	SaveIfNotExist(testName string) (int, error)
-	GetIdBy(testName string) (int, error)
-	Save(testName string) (int, error)
+	SaveIfNotExist(testName string) error
+	GetIdFromDBBy(testName string) (*string, error)
+	SaveDB(id, testName string) error
 
 	GetCache()
-	GetIdByCache(testName string) (int, error)
-	FlashCache(id int, testName string)
+	GetIdByCache(testName string) (*string, error)
+	FlashCache(id, testName string)
 }

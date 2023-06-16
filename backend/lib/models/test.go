@@ -1,6 +1,6 @@
 package models
 
 type Test struct {
-	Id   int
+	Id   string
 	Name string
 }

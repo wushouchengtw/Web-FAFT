@@ -10,73 +10,69 @@ import (
 
 type TestMySQL struct {
 	db    *sqlx.DB
-	mapId int
-	cache map[int]*models.Test
+	cache map[string]*models.Test
 }
 
 func NewTestRepoInMySQL(db *sqlx.DB) Itest {
 	return &TestMySQL{
 		db:    db,
-		mapId: 0,
-		cache: map[int]*models.Test{},
+		cache: map[string]*models.Test{},
 	}
 }
 
 func (t *TestMySQL) GetCache() {
-	dutList := []models.Test{}
-	t.db.Select(&dutList, "SELECT * FROM Test")
-	for _, dut := range dutList {
-		t.mapId++
-		t.cache[t.mapId] = &models.Test{Id: dut.Id, Name: dut.Name}
+	testList := []models.Test{}
+	t.db.Select(&testList, "SELECT * FROM Test")
+	for _, test := range testList {
+		t.cache[test.Id] = &models.Test{Id: test.Id, Name: test.Name}
 	}
 }
 
-func (t *TestMySQL) GetIdByCache(testName string) (int, error) {
-	for _, dut := range t.cache {
-		if dut.Name == testName {
-			return dut.Id, nil
+func (t *TestMySQL) GetIdByCache(testName string) (*string, error) {
+	for _, test := range t.cache {
+		if test.Name == testName {
+			return &test.Id, nil
 		}
 	}
-	return -1, utils.ErrNotFound
+	return nil, utils.ErrNotFound
 }
 
-func (t *TestMySQL) FlashCache(id int, testName string) {
-	t.mapId++
-	t.cache[t.mapId] = &models.Test{Id: id, Name: testName}
+func (t *TestMySQL) FlashCache(id, testName string) {
+	t.cache[id] = &models.Test{Id: id, Name: testName}
 }
 
-func (t *TestMySQL) GetIdBy(testName string) (int, error) {
-	var id int
+func (t *TestMySQL) GetIdFromDBBy(testName string) (*string, error) {
+	var id string
 	if err := t.db.Get(&id, "SELECT test_id FROM Test WHERE name=?", testName); err != nil {
-		return -1, fmt.Errorf("failed to find %q in DB: %v", testName, err)
+		return nil, fmt.Errorf("failed to find %q in DB: %v", testName, err)
 	}
-	return id, nil
+	return &id, nil
 }
 
-func (t *TestMySQL) Save(testName string) (int, error) {
-	_, err := t.db.NamedExec("INSERT INTO Test(name) VALUES(:name)", []map[string]interface{}{
-		{"name": testName},
+func (t *TestMySQL) SaveDB(id, testName string) error {
+	_, err := t.db.NamedExec("INSERT INTO Test(test_id,name) VALUES(:test_id,:name)", []map[string]interface{}{
+		{
+			"id":   id,
+			"name": testName,
+		},
 	})
 	if err != nil {
-		return 0, fmt.Errorf("failed to insert data into DB: %v", err)
+		return fmt.Errorf("failed to insert data into DB: %v", err)
 	}
-	return 0, nil
+	return nil
 }
 
-func (t *TestMySQL) SaveIfNotExist(testName string) (int, error) {
-	test_id, err := t.GetIdByCache(testName)
+func (t *TestMySQL) SaveIfNotExist(testName string) error {
+	_, err := t.GetIdByCache(testName)
 	if err == utils.ErrNotFound {
-		_, errSave := t.Save(testName)
-		if errSave != nil {
-			return -1, fmt.Errorf("failed to insert %q to DB: %v", testName, err)
-		} else {
-			test_id, errGetID := t.GetIdBy(testName)
-			if errGetID != nil {
-				return -1, fmt.Errorf("failed to find %q in DB: %v", testName, err)
+		test_id, err := t.GetIdFromDBBy(testName)
+		if err != nil {
+			if err := t.SaveDB(*test_id, testName); err != nil {
+				return fmt.Errorf("failed to save %q in DB: %v", testName, err)
 			}
-			t.FlashCache(test_id, testName)
-			return test_id, nil
 		}
+		t.FlashCache(*test_id, testName)
+		return nil
 	}
-	return test_id, nil
+	return nil
 }

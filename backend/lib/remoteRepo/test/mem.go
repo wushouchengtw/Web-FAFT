@@ -4,61 +4,47 @@ import (
 	"backend/lib/models"
 	"backend/utils"
 	"fmt"
+
+	"github.com/google/uuid"
 )
 
 type TestMem struct {
-	id   int
-	data map[int]*models.Test
+	data map[string]*models.Test
 }
 
 func NewTestRepoInMem() Itest {
 	return &TestMem{
-		id:   0,
-		data: map[int]*models.Test{},
+		data: map[string]*models.Test{},
 	}
 }
 
-func (t *TestMem) GetIdBy(testName string) (int, error) {
+func (t *TestMem) GetIdFromDBBy(testName string) (*string, error) {
 	for id, data := range t.data {
 		if data.Name == testName {
-			return id, nil
+			return &id, nil
 		}
 	}
-	return -1, utils.ErrNotFound
+	return nil, utils.ErrNotFound
 }
 
-func (t *TestMem) Save(testName string) (int, error) {
-	t.id += 1
-	t.data[t.id] = &models.Test{Name: testName}
-	return t.id, nil
+func (t *TestMem) SaveDB(id, testName string) error {
+	t.data[id] = &models.Test{Id: id, Name: testName}
+	return nil
 }
 
-func (t *TestMem) SaveIfNotExist(testName string) (int, error) {
-	test_id, err := t.GetIdBy(testName)
-	if err == utils.ErrNotFound {
-		_, errSave := t.Save(testName)
-		if errSave != nil {
-			return -1, fmt.Errorf("failed to save %q in DB: %v", testName, err)
-		} else {
-			test_id, errGetID := t.GetIdBy(testName)
-			if errGetID != nil {
-				return -1, fmt.Errorf("failed to find %q in DB: %v", testName, err)
-			}
-			t.FlashCache(test_id, testName)
-			return test_id, nil
+func (t *TestMem) SaveIfNotExist(testName string) error {
+	_, err := t.GetIdFromDBBy(testName)
+	if err != nil {
+		id := uuid.New().String()
+		if err := t.SaveDB(id, testName); err != nil {
+			return fmt.Errorf("failed to ")
 		}
 	}
-	return test_id, nil
+	return nil
 }
 
-func (t *TestMem) GetCache() {
+func (t *TestMem) GetCache()
 
-}
+func (t *TestMem) GetIdByCache(testName string) (*string, error)
 
-func (t *TestMem) GetIdByCache(testName string) (int, error) {
-	return 0, nil
-}
-
-func (t *TestMem) FlashCache(id int, testName string) {
-
-}
+func (t *TestMem) FlashCache(id, testName string)

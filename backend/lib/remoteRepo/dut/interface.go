@@ -1,11 +1,11 @@
 package dut
 
 type IDUT interface {
-	SaveIfNotExist(board, model string) (int, error)
-	Save(board, model string) (int, error)
-	GetIdBy(board, model string) (int, error)
+	SaveIfNotExist(board, model string) error
+	SaveDB(id, board, model string) error
+	GetIdFromDBBy(board, model string) (*string, error)
 
 	GetCache()
-	GetIdByCache(board, name string) (int, error)
-	FlashCache(id int, board, model string)
+	GetIdByCache(board, model string) (*string, error)
+	FlashCache(id, board, model string)
 }
