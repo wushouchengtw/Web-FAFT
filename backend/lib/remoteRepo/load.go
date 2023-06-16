@@ -103,22 +103,12 @@ func saveResult(row []string, header map[TestHausHeader]int, dutRepo dut.IDUT, t
 
 		err error
 	)
-	// dutId, err = dutRepo.GetIdByCache(board, model)
-	// if err == utils.ErrNotFound {
-	// 	dutId, err = dutRepo.Save(board, model)
-	// }
-	// if err != nil {
-	// 	return fmt.Errorf("failed on processing dut info: %v", err)
-	// }
 	dutId, err = dutRepo.SaveIfNotExist(board, model)
 	if err != nil {
 		return fmt.Errorf("failed on processing dut info: %v", err)
 	}
 
-	testId, err = testRepo.GetIdBy(test)
-	if err == utils.ErrFileNotExist {
-		testId, err = testRepo.Save(test)
-	}
+	testId, err = testRepo.SaveIfNotExist(test)
 	if err != nil {
 		return fmt.Errorf("failed on processing test info: %v", err)
 	}
@@ -127,7 +117,11 @@ func saveResult(row []string, header map[TestHausHeader]int, dutRepo dut.IDUT, t
 	if err != nil {
 		return err
 	}
+
 	duration, err = strconv.ParseFloat(fmt.Sprintf("%.2f", duration), 64)
+	if err != nil {
+		return err
+	}
 
 	buildVersion := strings.Split(row[header[BuildVersion]], "-")
 	if len(buildVersion) == 2 {
@@ -159,12 +153,10 @@ func saveResult(row []string, header map[TestHausHeader]int, dutRepo dut.IDUT, t
 		Milestone:         milestone,
 		Version:           version,
 		Status:            status,
-		FirmwareROVersion: FirmwareROVersion,
-		FirmwareRWVersion: FirmwareRWVersion,
-		Host:              Hostname,
+		FirmwareROVersion: row[header[FirmwareROVersion]],
+		FirmwareRWVersion: row[header[FirmwareRWVersion]],
+		Host:              row[header[Hostname]],
 	}
-
 	resultRepo.Save(record)
-
 	return nil
 }

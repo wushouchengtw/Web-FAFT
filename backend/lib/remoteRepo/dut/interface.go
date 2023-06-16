@@ -5,7 +5,7 @@ type IDUT interface {
 	Save(board, model string) (int, error)
 	GetIdBy(board, model string) (int, error)
 
-	GetDUTCache()
+	GetCache()
 	GetIdByCache(board, name string) (int, error)
-	FlahsDUTCache(id int, board, model string)
+	FlashCache(id int, board, model string)
 }

@@ -22,7 +22,7 @@ func NewDUTRepoInMySQL(db *sqlx.DB) IDUT {
 	}
 }
 
-func (ds *DUTMySQL) GetDUTCache() {
+func (ds *DUTMySQL) GetCache() {
 	dutList := []models.DUT{}
 	ds.db.Select(&dutList, "SELECT * FROM DUT")
 	for _, dut := range dutList {
@@ -40,7 +40,7 @@ func (ds *DUTMySQL) GetIdByCache(board, model string) (int, error) {
 	return -1, utils.ErrNotFound
 }
 
-func (ds *DUTMySQL) FlahsDUTCache(id int, board, model string) {
+func (ds *DUTMySQL) FlashCache(id int, board, model string) {
 	ds.mapId++
 	ds.cache[ds.mapId] = &models.DUT{Id: id, Board: board, Model: model}
 }
@@ -67,7 +67,7 @@ func (ds *DUTMySQL) GetIdBy(board, model string) (int, error) {
 
 func (ds *DUTMySQL) SaveIfNotExist(board, model string) (int, error) {
 	dut_id, err := ds.GetIdByCache(board, model)
-	if err != nil {
+	if err == utils.ErrNotFound {
 		_, errSave := ds.Save(board, model)
 		if errSave != nil {
 			return -1, fmt.Errorf("failed to insert (%s,%s) to DB: %v", board, model, err)
@@ -76,10 +76,9 @@ func (ds *DUTMySQL) SaveIfNotExist(board, model string) (int, error) {
 			if errGetID != nil {
 				return -1, fmt.Errorf("failed to find (%s,%s) in DB: %v", board, model, err)
 			}
-			ds.FlahsDUTCache(dut_id, board, model)
+			ds.FlashCache(dut_id, board, model)
 			return dut_id, nil
 		}
-	} else {
-		return dut_id, nil
 	}
+	return dut_id, nil
 }

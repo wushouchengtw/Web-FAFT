@@ -4,17 +4,17 @@ type TestHausHeader string
 
 const (
 	Suite             TestHausHeader = "Suite"
-	Board                            = "Board"
-	Model                            = "Model"
-	Test                             = "Test"
-	Status                           = "Status"
-	FailureReason                    = "Failure Reason"
-	StartedTime                      = "Started Time (UTC)"
-	Duration                         = "Duration (s)"
-	BuildVersion                     = "Build Version"
-	FirmwareROVersion                = "Firmware RO Version"
-	FirmwareRWVersion                = "Firmware RW Version"
-	Hostname                         = "Hostname"
+	Board             TestHausHeader = "Board"
+	Model             TestHausHeader = "Model"
+	Test              TestHausHeader = "Test"
+	Status            TestHausHeader = "Status"
+	FailureReason     TestHausHeader = "Failure Reason"
+	StartedTime       TestHausHeader = "Started Time (UTC)"
+	Duration          TestHausHeader = "Duration (s)"
+	BuildVersion      TestHausHeader = "Build Version"
+	FirmwareROVersion TestHausHeader = "Firmware RO Version"
+	FirmwareRWVersion TestHausHeader = "Firmware RW Version"
+	Hostname          TestHausHeader = "Hostname"
 )
 
 const timeLayout = "2006-01-02 15:04:05"

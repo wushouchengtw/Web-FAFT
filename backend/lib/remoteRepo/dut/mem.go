@@ -3,6 +3,7 @@ package dut
 import (
 	"backend/lib/models"
 	"backend/utils"
+	"fmt"
 )
 
 type DutMem struct {
@@ -36,17 +37,31 @@ func (dm *DutMem) GetIdByCache(board, model string) (int, error) {
 	return -1, utils.ErrNotFound
 }
 
-// To-do
-func (dm *DutMem) GetDUTCache() {
+func (dm *DutMem) SaveIfNotExist(board, model string) (int, error) {
+	dut_id, err := dm.GetIdBy(board, model)
+	if err == utils.ErrNotFound {
+		_, errSave := dm.Save(board, model)
+		if errSave != nil {
+			return -1, fmt.Errorf("failed to save (%q,%q) in DB: %v", board, model, err)
+		} else {
+			dut_id, errGetID := dm.GetIdBy(board, model)
+			if errGetID != nil {
+				return -1, fmt.Errorf("failed to find (%q,%q) in DB: %v", board, model, err)
+			}
+			dm.FlashCache(dut_id, board, model)
+			return dut_id, nil
+		}
+	}
+	return dut_id, nil
 }
 
-func (dm *DutMem) SaveIfNotExist(board, model string) (int, error) {
-	return 0, nil
+func (dm *DutMem) GetCache() {
+
 }
 func (dm *DutMem) GetIdBy(board, model string) (int, error) {
 	return 0, nil
 }
 
-func (dm *DutMem) FlahsDUTCache(id int, board, model string) {
+func (dm *DutMem) FlashCache(id int, board, model string) {
 
 }
