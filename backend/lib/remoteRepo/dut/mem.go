@@ -27,7 +27,7 @@ func (dm *DutMem) Save(board, model string) (int, error) {
 	return dm.id, nil
 }
 
-func (dm *DutMem) GetIdBy(board, model string) (int, error) {
+func (dm *DutMem) GetIdByCache(board, model string) (int, error) {
 	for id, dut := range dm.data {
 		if dut.Board == board && dut.Model == model {
 			return id, nil
@@ -36,5 +36,17 @@ func (dm *DutMem) GetIdBy(board, model string) (int, error) {
 	return -1, utils.ErrNotFound
 }
 
+// To-do
 func (dm *DutMem) GetDUTCache() {
+}
+
+func (dm *DutMem) SaveIfNotExist(board, model string) (int, error) {
+	return 0, nil
+}
+func (dm *DutMem) GetIdBy(board, model string) (int, error) {
+	return 0, nil
+}
+
+func (dm *DutMem) FlahsDUTCache(id int, board, model string) {
+
 }

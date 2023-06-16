@@ -93,7 +93,6 @@ func saveResult(row []string, header map[TestHausHeader]int, dutRepo dut.IDUT, t
 	var (
 		dutId     int
 		testId    int
-		err       error
 		board     string = row[header[Board]]
 		model     string = row[header[Model]]
 		test      string = row[header[Test]]
@@ -101,11 +100,17 @@ func saveResult(row []string, header map[TestHausHeader]int, dutRepo dut.IDUT, t
 		milestone string = "unknown"
 		version   string = "unknown"
 		status    bool   = false
+
+		err error
 	)
-	dutId, err = dutRepo.GetIdBy(board, model)
-	if err == utils.ErrNotFound {
-		dutId, err = dutRepo.Save(board, model)
-	}
+	// dutId, err = dutRepo.GetIdByCache(board, model)
+	// if err == utils.ErrNotFound {
+	// 	dutId, err = dutRepo.Save(board, model)
+	// }
+	// if err != nil {
+	// 	return fmt.Errorf("failed on processing dut info: %v", err)
+	// }
+	dutId, err = dutRepo.SaveIfNotExist(board, model)
 	if err != nil {
 		return fmt.Errorf("failed on processing dut info: %v", err)
 	}
