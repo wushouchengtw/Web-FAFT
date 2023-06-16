@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx"
 )
 
 func engine(config *Configuration) *gin.Engine {
@@ -22,16 +23,18 @@ func engine(config *Configuration) *gin.Engine {
 	default:
 		gin.SetMode(gin.TestMode)
 	}
+	return engine
+}
 
+func Run(config Configuration, listener net.Listener, db *sqlx.DB) (*http.Server, error) {
+	engine := engine(&config)
+
+	// Set up engine config
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
 	engine.Use(cors.New(corsConfig))
 
-	return engine
-}
-
-func Run(config Configuration, listener net.Listener) (*http.Server, error) {
-	engine := engine(&config)
+	// engine.POST("/uploadCSV", v1.UploadCsv(db))
 
 	srv := &http.Server{Handler: engine.Handler()}
 
