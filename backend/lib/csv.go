@@ -86,6 +86,7 @@ func getCsvFiles() ([]byte, error) {
 
 func verifyOverlap(bytes []byte, newFilename string) bool {
 	fileNames := strings.Split(string(bytes), "\n")
+	fileNames = fileNames[0 : len(fileNames)-1]
 	for _, fileName := range fileNames {
 		if testOverlap := overlap(newFilename, fileName); testOverlap {
 			return true
@@ -111,4 +112,19 @@ func overlap(newFilename string, fileName string) bool {
 		return false
 	}
 	return true
+}
+
+func RemoveCsvFile(csvFile string) error {
+	cmdString := fmt.Sprintf("rm %s/%s", CsvFolder, csvFile)
+	cmd := exec.Command("bash", "-c", cmdString)
+
+	log.Println("Removing csv")
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("while running %s: %v", cmdString, err)
+	}
+
+	if err := cmd.Wait(); err != nil {
+		return fmt.Errorf("an error happened when remove csv file in server: %v", err)
+	}
+	return nil
 }
