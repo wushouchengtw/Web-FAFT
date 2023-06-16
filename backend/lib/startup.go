@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,6 +22,10 @@ func engine(config *Configuration) *gin.Engine {
 	default:
 		gin.SetMode(gin.TestMode)
 	}
+
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	engine.Use(cors.New(corsConfig))
 
 	return engine
 }
