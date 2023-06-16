@@ -1,7 +1,7 @@
 package dut
 
 type IDUT interface {
-	SaveIfNotExist(board, model string) error
+	SaveIfNotExist(board, model string) (*string, error)
 	SaveDB(id, board, model string) error
 	GetIdFromDBBy(board, model string) (*string, error)
 

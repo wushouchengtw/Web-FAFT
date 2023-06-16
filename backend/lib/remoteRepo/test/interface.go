@@ -1,7 +1,7 @@
 package test
 
 type Itest interface {
-	SaveIfNotExist(testName string) error
+	SaveIfNotExist(testName string) (*string, error)
 	GetIdFromDBBy(testName string) (*string, error)
 	SaveDB(id, testName string) error
 

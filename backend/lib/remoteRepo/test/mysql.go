@@ -5,6 +5,7 @@ import (
 	"backend/utils"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -52,8 +53,8 @@ func (t *TestMySQL) GetIdFromDBBy(testName string) (*string, error) {
 func (t *TestMySQL) SaveDB(id, testName string) error {
 	_, err := t.db.NamedExec("INSERT INTO Test(test_id,name) VALUES(:test_id,:name)", []map[string]interface{}{
 		{
-			"id":   id,
-			"name": testName,
+			"test_id": id,
+			"name":    testName,
 		},
 	})
 	if err != nil {
@@ -62,17 +63,20 @@ func (t *TestMySQL) SaveDB(id, testName string) error {
 	return nil
 }
 
-func (t *TestMySQL) SaveIfNotExist(testName string) error {
-	_, err := t.GetIdByCache(testName)
+func (t *TestMySQL) SaveIfNotExist(testName string) (*string, error) {
+	testID, err := t.GetIdByCache(testName)
 	if err == utils.ErrNotFound {
 		test_id, err := t.GetIdFromDBBy(testName)
 		if err != nil {
-			if err := t.SaveDB(*test_id, testName); err != nil {
-				return fmt.Errorf("failed to save %q in DB: %v", testName, err)
+			id := uuid.New().String()
+			if err := t.SaveDB(id, testName); err != nil {
+				return nil, fmt.Errorf("failed to save %q in DB: %v", testName, err)
 			}
+			t.FlashCache(id, testName)
+		} else {
+			t.FlashCache(*test_id, testName)
 		}
-		t.FlashCache(*test_id, testName)
-		return nil
+		return test_id, nil
 	}
-	return nil
+	return testID, nil
 }

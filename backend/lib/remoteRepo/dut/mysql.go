@@ -63,9 +63,9 @@ func (ds *DUTMySQL) GetIdFromDBBy(board, model string) (*string, error) {
 	return &id, nil
 }
 
-func (ds *DUTMySQL) SaveIfNotExist(board, model string) error {
+func (ds *DUTMySQL) SaveIfNotExist(board, model string) (*string, error) {
 	// Search cache
-	_, err := ds.GetIdByCache(board, model)
+	dutID, err := ds.GetIdByCache(board, model)
 	// Cache miss
 	if err == utils.ErrNotFound {
 		// Search DB
@@ -75,11 +75,13 @@ func (ds *DUTMySQL) SaveIfNotExist(board, model string) error {
 			id := uuid.New().String()
 			errSave := ds.SaveDB(id, board, model)
 			if errSave != nil {
-				return fmt.Errorf("failed to save in DB: %v", err)
+				return nil, fmt.Errorf("failed to save in DB: %v", err)
 			}
+			ds.FlashCache(id, board, model)
+		} else {
+			ds.FlashCache(*dut_id, board, model)
 		}
-		ds.FlashCache(*dut_id, board, model)
-		return nil
+		return dut_id, nil
 	}
-	return nil
+	return dutID, nil
 }

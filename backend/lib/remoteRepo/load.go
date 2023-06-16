@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func SaveRemoteDataByCsv(fileName string, dutRepo dut.IDUT, testRepo test.Itest, resultRepo result.IResut) error {
@@ -91,8 +93,8 @@ func saveResult(row []string, header map[TestHausHeader]int, dutRepo dut.IDUT, t
 
 	// Parse data
 	var (
-		dutId     int
-		testId    int
+		dutId     *string
+		testId    *string
 		board     string = row[header[Board]]
 		model     string = row[header[Model]]
 		test      string = row[header[Test]]
@@ -143,12 +145,14 @@ func saveResult(row []string, header map[TestHausHeader]int, dutRepo dut.IDUT, t
 		return utils.ErrInvalidData
 	}
 
+	id := uuid.New().String()
 	record := &models.Result{
+		Id:                id,
 		Suite:             row[header[Suite]],
 		Time:              startTime,
 		Duration:          duration,
-		DutId:             dutId,
-		TestId:            testId,
+		DutId:             *dutId,
+		TestId:            *testId,
 		Reason:            row[header[FailureReason]],
 		Milestone:         milestone,
 		Version:           version,

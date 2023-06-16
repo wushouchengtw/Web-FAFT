@@ -36,16 +36,16 @@ func (dm *DutMem) GetIdFromDBBy(board, model string) (*string, error) {
 	return nil, utils.ErrNotFound
 }
 
-func (dm *DutMem) SaveIfNotExist(board, model string) error {
-	_, err := dm.GetIdFromDBBy(board, model)
+func (dm *DutMem) SaveIfNotExist(board, model string) (*string, error) {
+	dutID, err := dm.GetIdFromDBBy(board, model)
 	if err == utils.ErrNotFound {
 		id := uuid.New().String()
 		errSave := dm.SaveDB(id, board, model)
 		if errSave != nil {
-			return fmt.Errorf("failed to insert (%q,%q) to DB: %v", board, model, err)
+			return nil, fmt.Errorf("failed to insert (%q,%q) to DB: %v", board, model, err)
 		}
 	}
-	return nil
+	return dutID, nil
 }
 
 func (dm *DutMem) GetCache()

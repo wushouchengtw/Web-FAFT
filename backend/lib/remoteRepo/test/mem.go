@@ -32,15 +32,15 @@ func (t *TestMem) SaveDB(id, testName string) error {
 	return nil
 }
 
-func (t *TestMem) SaveIfNotExist(testName string) error {
-	_, err := t.GetIdFromDBBy(testName)
+func (t *TestMem) SaveIfNotExist(testName string) (*string, error) {
+	testID, err := t.GetIdFromDBBy(testName)
 	if err != nil {
 		id := uuid.New().String()
 		if err := t.SaveDB(id, testName); err != nil {
-			return fmt.Errorf("failed to ")
+			return nil, fmt.Errorf("failed to ")
 		}
 	}
-	return nil
+	return testID, nil
 }
 
 func (t *TestMem) GetCache()
