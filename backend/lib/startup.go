@@ -34,7 +34,7 @@ func Run(config Configuration, listener net.Listener, db *sqlx.DB) (*http.Server
 	corsConfig.AllowAllOrigins = true
 	engine.Use(cors.New(corsConfig))
 
-	// engine.POST("/uploadCSV", v1.UploadCsv(db))
+	engine.POST("/uploadCSV", HanlderUploadCsv(db))
 
 	srv := &http.Server{Handler: engine.Handler()}
 
