@@ -12,3 +12,4 @@ func (r *ResultMem) Save(v *models.Result) (int, error) {
 	r.data[r.id] = v
 	return r.id, nil
 }
+func (r *ResultMem) SearchTestHaus(search models.SearchParams)

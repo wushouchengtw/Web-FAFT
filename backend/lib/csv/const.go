@@ -1,4 +1,4 @@
-package remoterepo
+package csv
 
 type TestHausHeader string
 

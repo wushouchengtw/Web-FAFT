@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"backend/lib/handlers"
 	"log"
 	"net"
 	"net/http"
@@ -34,7 +35,7 @@ func Run(config Configuration, listener net.Listener, db *sqlx.DB) (*http.Server
 	corsConfig.AllowAllOrigins = true
 	engine.Use(cors.New(corsConfig))
 
-	engine.POST("/uploadCSV", HanlderUploadCsv(db))
+	engine.POST("/uploadCSV", handlers.HanlderUploadCsv(db))
 
 	srv := &http.Server{Handler: engine.Handler()}
 

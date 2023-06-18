@@ -24,3 +24,7 @@ func (r *ResultMySQL) Save(v *models.Result) (int, error) {
 	}
 	return 0, nil
 }
+
+func (r *ResultMySQL) SearchTestHaus(search models.SearchParams) {
+
+}
