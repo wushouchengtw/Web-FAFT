@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"backend/lib/csv"
-	"backend/lib/models"
 	"backend/lib/remoteRepo/dut"
 	"backend/lib/remoteRepo/result"
 	"backend/lib/remoteRepo/test"
+	"backend/utils/query"
 	"log"
 	"net/http"
 
@@ -41,8 +41,7 @@ func HanlderUploadCsv(db *sqlx.DB) gin.HandlerFunc {
 
 func HanlderTesthaus(db *sqlx.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		params := models.SearchParams{
-			TableName: "Result",
+		params := query.QueryParameter{
 			Board:     ctx.Query("board"),
 			Reason:    ctx.Query("reason"),
 			Name:      ctx.Query("testName"),

@@ -1,8 +1,11 @@
 package result
 
-import "backend/lib/models"
+import (
+	"backend/lib/models"
+	webmodels "backend/utils/web/web_models"
+)
 
 type IResut interface {
 	Save(v *models.Result) (int, error)
-	SearchTestHaus(search models.SearchParams)
+	SearchTestHaus(params webmodels.QueryParameter)
 }

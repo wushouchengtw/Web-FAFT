@@ -1,6 +1,9 @@
 package result
 
-import "backend/lib/models"
+import (
+	"backend/lib/models"
+	webmodels "backend/utils/web/web_models"
+)
 
 type ResultMem struct {
 	id   int
@@ -12,4 +15,4 @@ func (r *ResultMem) Save(v *models.Result) (int, error) {
 	r.data[r.id] = v
 	return r.id, nil
 }
-func (r *ResultMem) SearchTestHaus(search models.SearchParams)
+func (r *ResultMem) SearchTestHaus(params webmodels.QueryParameter)

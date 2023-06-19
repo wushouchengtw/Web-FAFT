@@ -1,12 +1,17 @@
-package models
+package webmodels
 
-type SearchParams struct {
+type QueryParameter struct {
 	StartDate string
 	EndDate   string
-	TableName string
 	Board     string
 	Reason    string
 	Name      string
 	Result    string
 	OrderBy   string
+}
+
+type QueryValue struct {
+	Filter    string
+	Value     string
+	Condition string
 }

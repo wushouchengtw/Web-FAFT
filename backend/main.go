@@ -2,7 +2,6 @@ package main
 
 import (
 	"backend/lib"
-	"backend/lib/startup"
 	"context"
 	"fmt"
 	"log"
@@ -39,7 +38,7 @@ func main() {
 		log.Fatal("Failed to connect to DB: ", err)
 	}
 
-	srv, err := startup.Run(*config, listener, db)
+	srv, err := lib.Run(*config, listener, db)
 	if err != nil {
 		log.Fatalf("Can't run the server, got an {%v}", err)
 	}
@@ -57,10 +56,8 @@ func main() {
 		log.Fatalf("Shutdown server got an {%v}", err)
 	}
 
-	select {
-	case <-ctx.Done():
-		log.Println("Shutdown server timeout")
-	}
+	<-ctx.Done()
+	log.Println("Shutdown server timeout")
 
 	log.Println("Gracefully shutdown server")
 }
