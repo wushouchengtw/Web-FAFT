@@ -2,7 +2,6 @@ package result
 
 import (
 	"backend/lib/models"
-	webmodels "backend/utils/web/web_models"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -26,6 +25,6 @@ func (r *ResultMySQL) Save(v *models.Result) (int, error) {
 	return 0, nil
 }
 
-func (r *ResultMySQL) SearchTestHaus(params webmodels.QueryParameter) {
+// func (r *ResultMySQL) SearchTestHaus(params webmodels.QueryParameter) {
 
-}
+// }
