@@ -38,8 +38,12 @@ func ToConditions(q interface{}) ([]QueryOperation, error) {
 			switch field.Type.Kind() {
 			case reflect.Struct:
 				if field.Type == reflect.TypeOf(time.Time{}) {
-					q.Where = fmt.Sprintf("%s%s", field.Tag.Get("field"), field.Tag.Get("op"))
-					q.Value = v.(time.Time)
+					if field.Tag.Get("op") != "none" {
+						q.Where = fmt.Sprintf("%s%s", field.Tag.Get("field"), field.Tag.Get("op"))
+						q.Value = v.(time.Time)
+					} else {
+						q.Value = v.(time.Time)
+					}
 				}
 			case reflect.String:
 				if field.Tag.Get("op") != "none" {
@@ -49,8 +53,12 @@ func ToConditions(q interface{}) ([]QueryOperation, error) {
 					q.Where = v.(string)
 				}
 			case reflect.Bool:
-				q.Where = fmt.Sprintf("%s%s", field.Tag.Get("field"), field.Tag.Get("op"))
-				q.Value = v.(bool)
+				if field.Tag.Get("op") != "none" {
+					q.Where = fmt.Sprintf("%s%s", field.Tag.Get("field"), field.Tag.Get("op"))
+					q.Value = v.(bool)
+				} else {
+					q.Value = v.(bool)
+				}
 			default:
 				fmt.Printf("Un-supported type {%v}", field.Type.Kind())
 			}
