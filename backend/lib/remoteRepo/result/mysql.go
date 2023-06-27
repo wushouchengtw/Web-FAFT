@@ -2,6 +2,7 @@ package result
 
 import (
 	"backend/lib/models"
+	"backend/utils"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -25,6 +26,43 @@ func (r *ResultMySQL) Save(v *models.Result) (int, error) {
 	return 0, nil
 }
 
-// func (r *ResultMySQL) SearchTestHaus(params webmodels.QueryParameter) {
-
+// func (r *ResultMySQL) GetAllDUT() ([]models.DUT, error) {
+// 	dut := []models.DUT{}
+// 	if err := r.db.Select(dut, "select * from DUT"); err != nil {
+// 		return dut, fmt.Errorf("failed to get dut list from DUT: %v", err)
+// 	}
+// 	return dut, nil
 // }
+
+// func (r *ResultMySQL) GetAllTest() ([]models.Test, error) {
+// 	test := []models.Test{}
+// 	if err := r.db.Select(test, "select * from Test"); err != nil {
+// 		return test, fmt.Errorf("failed to get dut list from DUT: %v", err)
+// 	}
+// 	return test, nil
+// }
+
+// To-do: join Table?
+func (r *ResultMySQL) SearchTestHaus(params utils.QueryParameter) ([]models.Result, error) {
+	output := []models.Result{}
+	options, err := utils.ToConditions(params)
+	if err != nil {
+		return output, fmt.Errorf("failed to parse the searching input: %v", err)
+	}
+	sql := "select * from Result"
+	args := make([]interface{}, 0, len(options))
+	for index, option := range options {
+		if index == 0 {
+			sql += " WHERE " + option.Where
+			args = append(args, option.Value)
+			continue
+		}
+		sql += " AND " + option.Where
+		args = append(args, option.Value)
+	}
+
+	if err := r.db.Select(output, sql, args...); err != nil {
+		return output, fmt.Errorf("failed to get result: %v", err)
+	}
+	return output, nil
+}
