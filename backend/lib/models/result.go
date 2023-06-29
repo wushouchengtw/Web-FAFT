@@ -17,3 +17,20 @@ type Result struct {
 	FirmwareROVersion string    `db:"firmware_RO_Version"`
 	FirmwareRWVersion string    `db:"firmware_RW_Version"`
 }
+
+type RawDataFromResult struct {
+	Id                string    `db:"result_id"`
+	Time              time.Time `db:"time"`
+	Duration          float64   `db:"duration"`
+	Suite             string    `db:"suite"`
+	Board             string    `db:"board"`
+	Model             string    `db:"model"`
+	Milestone         string    `db:"milestone"`
+	Version           string    `db:"version"`
+	Host              string    `db:"host"`
+	TestName          string    `db:"test_name"`
+	Status            bool      `db:"status"`
+	Reason            string    `db:"reason"`
+	FirmwareROVersion string    `db:"firmware_RO_Version"`
+	FirmwareRWVersion string    `db:"firmware_RW_Version"`
+}

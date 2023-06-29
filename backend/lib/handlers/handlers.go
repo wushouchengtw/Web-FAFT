@@ -5,9 +5,11 @@ import (
 	"backend/lib/remoteRepo/dut"
 	"backend/lib/remoteRepo/result"
 	"backend/lib/remoteRepo/test"
-	"backend/utils/query"
+	"backend/utils"
 	"log"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
@@ -41,23 +43,38 @@ func HanlderUploadCsv(db *sqlx.DB) gin.HandlerFunc {
 
 func HanlderTesthaus(db *sqlx.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		params := query.QueryParameter{
+		startTime, err := time.Parse(timeLayout, ctx.Query("startDate"))
+		if err != nil {
+			log.Panicf("unexpected startTime [%s]", ctx.Query("startDate"))
+		}
+		endTime, err := time.Parse(timeLayout, ctx.Query("endDate"))
+		if err != nil {
+			log.Panicf("unexpected endTime [%s]", ctx.Query("endDate"))
+		}
+
+		var status bool
+		switch strings.ToLower(ctx.Query("result")) {
+		case "pass":
+			status = true
+		case "fail":
+			status = false
+		default:
+			log.Panicf("unexpected status [%s]", ctx.Query("result"))
+		}
+
+		params := utils.QueryParameter{
+			StartDate: startTime,
+			EndDate:   endTime,
 			Board:     ctx.Query("board"),
 			Reason:    ctx.Query("reason"),
 			Name:      ctx.Query("testName"),
-			Result:    ctx.Query("result"),
-			StartDate: ctx.Query("startDate"),
-			EndDate:   ctx.Query("endDate"),
-			OrderBy:   ctx.Query("orderBy"),
+			Status:    status,
 		}
 		resultRepo := result.NewResultRepoMySQL(db)
-		// To-do
-		resultRepo.SearchTestHaus(params)
-		// 	stainlessResult, err := resultRepo.SearchTestHaus(params)
-		// 	if err != nil {
-		// 		log.Panicf("Failed to search data in table %q: %v", params.TableName, err)
-		// 	}
-		// 	ctx.IndentedJSON(http.StatusOK, stainlessResult)
-		// }
+		output, err := resultRepo.SearchTestHaus(params)
+		if err != nil {
+			ctx.IndentedJSON(http.StatusNotFound, output)
+		}
+		ctx.IndentedJSON(http.StatusOK, output)
 	}
 }

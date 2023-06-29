@@ -35,7 +35,12 @@ func Run(config Configuration, listener net.Listener, db *sqlx.DB) (*http.Server
 	corsConfig.AllowAllOrigins = true
 	engine.Use(cors.New(corsConfig))
 
-	engine.POST("/uploadCSV", handlers.HanlderUploadCsv(db))
+	engine.POST("/uploadCSV", func(ctx *gin.Context) {
+		handlers.HanlderUploadCsv(db)
+	})
+	engine.GET("/stainlessSearch", func(ctx *gin.Context) {
+		handlers.HanlderTesthaus(db)
+	})
 
 	srv := &http.Server{Handler: engine.Handler()}
 

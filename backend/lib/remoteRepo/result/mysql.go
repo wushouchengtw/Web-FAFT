@@ -43,24 +43,18 @@ func (r *ResultMySQL) Save(v *models.Result) (int, error) {
 // }
 
 // To-do: join Table?
-func (r *ResultMySQL) SearchTestHaus(params utils.QueryParameter) ([]models.Result, error) {
-	output := []models.Result{}
+func (r *ResultMySQL) SearchTestHaus(params utils.QueryParameter) ([]models.RawDataFromResult, error) {
+	output := []models.RawDataFromResult{}
 	options, err := utils.ToConditions(params)
 	if err != nil {
 		return output, fmt.Errorf("failed to parse the searching input: %v", err)
 	}
-	sql := "select * from Result"
+	sql := "select Result.*, DUT.board as board, DUT.model as model, Test.name as test_name from Result, Dut, Test Where Resut.dut_id = Dut.dut_id AND Resut.test_id = Test.test_id "
 	args := make([]interface{}, 0, len(options))
-	for index, option := range options {
-		if index == 0 {
-			sql += " WHERE " + option.Where
-			args = append(args, option.Value)
-			continue
-		}
+	for _, option := range options {
 		sql += " AND " + option.Where
 		args = append(args, option.Value)
 	}
-
 	if err := r.db.Select(output, sql, args...); err != nil {
 		return output, fmt.Errorf("failed to get result: %v", err)
 	}
