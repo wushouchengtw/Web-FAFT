@@ -49,7 +49,9 @@ func SaveRemoteDataByCsv(fileName string, dutRepo dut.IDUT, testRepo test.Itest,
 		if err != nil {
 			return utils.ErrInvalidData
 		}
-		saveResult(row, header, dutRepo, testRepo, resultRepo)
+		if err := saveResult(row, header, dutRepo, testRepo, resultRepo); err != nil {
+			return fmt.Errorf("failed to save row data [%v]: %v ", row, err)
+		}
 	}
 	return nil
 }

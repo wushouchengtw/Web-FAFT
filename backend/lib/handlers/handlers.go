@@ -29,7 +29,7 @@ func HanlderUploadCsv(db *sqlx.DB) gin.HandlerFunc {
 			testRepo := test.NewTestRepoInMySQL(db)
 			resultRepo := result.NewResultRepoMySQL(db)
 
-			if err := csv.SaveRemoteDataByCsv(csv.CsvFolder+"/"+file.Filename, dutRepo, testRepo, resultRepo); err != nil {
+			if err := csv.SaveRemoteDataByCsv(csv.CsvFolder+file.Filename, dutRepo, testRepo, resultRepo); err != nil {
 				if err := csv.RemoveCsvFile(file.Filename); err != nil {
 					ctx.String(http.StatusOK, "Failed to remove the csv file: ", err)
 				}

@@ -7,7 +7,6 @@ import (
 	"log"
 	"os/exec"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -96,14 +95,14 @@ func verifyOverlap(bytes []byte, newFilename string) bool {
 }
 
 func overlap(newFilename string, fileName string) bool {
-	newFileDate := strings.Split(newFilename, "-")
-	fileDate := strings.Split(fileName, "-")
+	nameReg, _ := regexp.Compile(`(\d{8})-(\d{8}).csv`)
+	matchesNewFile := nameReg.FindStringSubmatch(newFilename)
+	n1 := matchesNewFile[1]
+	n2 := matchesNewFile[2]
 
-	n1, _ := strconv.Atoi(newFileDate[0])
-	n2, _ := strconv.Atoi(newFileDate[1])
-
-	f1, _ := strconv.Atoi(fileDate[0])
-	f2, _ := strconv.Atoi(fileDate[1])
+	matchFileName := nameReg.FindStringSubmatch(fileName)
+	f1 := matchFileName[1]
+	f2 := matchFileName[2]
 
 	if n2 < f1 {
 		return false

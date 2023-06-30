@@ -1,3 +1,3 @@
 package csv
 
-const CsvFolder = "statics/testHaus"
+const CsvFolder = "lib/statics/testHaus"
